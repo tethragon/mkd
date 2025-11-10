@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπολογισμός ΜΚΔ (Φιλικός προς Μαθητές)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #005a9c;
+            margin-top: 0;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        #numbersInput {
+            width: calc(100% - 2rem);
+            padding: 0.9rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #calculateBtn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #resetBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #resultContainer {
+            margin-top: 2rem;
+            display: none;
+            text-align: left;
+        }
+
+        #stepsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        #stepsTable th, 
+        #stepsTable td {
+            border: 1px solid #ddd;
+            padding: 0.8rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #stepsTable th {
+            background-color: #f0f8ff;
+            color: #005a9c;
+            font-weight: 700;
+        }
+
+        .num-cell {
+            border-right: 2px solid #005a9c;
+            font-weight: 600;
+            /* Ορίζουμε ένα min-height για τα κενά κελιά */
+            min-height: 1.5em; 
+        }
+        
+        .explanation-cell {
+            text-align: left;
+            font-style: italic;
+            font-family: Arial, sans-serif;
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            border-left: 2px solid #005a9c;
+            line-height: 1.5; 
+        }
+
+        #finalResult {
+            margin-top: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #28a745;
+            text-align: center;
+        }
+
+        #error {
+            color: #dc3545;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Υπολογιστής ΜΚΔ (Μέθοδος Διαδοχικών Διαιρέσεων)</h1>
+        <p>Εισάγετε τους φυσικούς αριθμούς, χωρισμένους με κόμμα (π.χ. 15, 25, 30).</p>
+        
+        <input type="text" id="numbersInput" placeholder="π.χ. 12, 18, 24">
+        
+        <div class="button-group">
+            <button id="calculateBtn">Υπολογισμός ΜΚΔ</button>
+            <button id="resetBtn">Εκκαθάριση</button>
+        </div>
+        
+        <div id="resultContainer">
+            <h3>Βήματα Διαδικασίας</h3>
+            <table id="stepsTable">
+                <thead id="stepsHead">
+                </thead>
+                <tbody id="stepsBody">
+                </tbody>
+            </table>
+            <div id="finalResult"></div>
+        </div>
+
+        <div id="error"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            const numbersInput = document.getElementById('numbersInput');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            const resultContainer = document.getElementById('resultContainer');
+            const stepsHead = document.getElementById('stepsHead');
+            const stepsBody = document.getElementById('stepsBody');
+            const finalResultDiv = document.getElementById('finalResult');
+            const errorDiv = document.getElementById('error');
+
+            function findMKDWithSteps(initialNumbers) {
+                let history = []; 
+                let currentNumbers = [...initialNumbers];
+                
+                let initialNonZeros = currentNumbers.filter(n => n > 0);
+                if (initialNonZeros.length <= 1) {
+                    let gcd = initialNonZeros.length === 1 ? initialNonZeros[0] : 0;
+                    let explanation;
+                    if (initialNonZeros.length === 0) {
+                        explanation = "Όλοι οι αριθμοί είναι 0. ΜΚΔ = 0";
+                    } else if (initialNumbers.length > 1) {
+                         explanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                    } else {
+                         explanation = `Μόνο ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                    }
+                    history.push({ numbers: currentNumbers, explanation: explanation });
+                    return { gcd: gcd, steps: history };
+                }
+
+                while (true) {
+                    const minVal = Math.min(...currentNumbers.filter(n => n > 0));
+                    
+                    let minFound = false; 
+                    let explanations = []; 
+                    
+                    let newNumbers = currentNumbers.map(n => {
+                        if (n === 0) return 0;
+                        if (n === minVal && !minFound) {
+                            minFound = true;
+                            return n; 
+                        }
+                        
+                        let rem = n % minVal; 
+                        if (n !== 0 && (n !== minVal || minFound)) {
+                             let quotient = Math.floor(n / minVal); 
+                             explanations.push(`${n} : ${minVal} = ${quotient} (<strong>υ=${rem}</strong>)`);
+                        }
+                        return rem;
+                    });
+
+                    let explanationString = `Μικρότερος: <strong>${minVal}</strong>. ${explanations.join(', ')}`;
+                    
+                    // <<< ΑΡΧΗ ΤΡΟΠΟΠΟΙΗΣΗΣ >>>
+                    
+                    // 1. Πάντα αποθηκεύουμε το βήμα υπολογισμού
+                    history.push({ numbers: newNumbers, explanation: explanationString });
+                    
+                    // 2. Ελέγχουμε *μετά* αν αυτό ήταν το τελευταίο βήμα
+                    let nonZerosInNew = newNumbers.filter(n => n > 0);
+                    
+                    if (nonZerosInNew.length <= 1) {
+                        // Αν ναι, βρήκαμε τον ΜΚΔ
+                        let gcd = nonZerosInNew.length === 1 ? nonZerosInNew[0] : 0;
+                        let finalExplanation;
+                        
+                        if (gcd === 0) {
+                            finalExplanation = "Όλοι οι αριθμοί είναι 0. ΜΚΔ = 0";
+                        } else {
+                            finalExplanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                        }
+                        
+                        // 3. Προσθέτουμε μια ΝΕΑ, ΤΕΛΙΚΗ σειρά, χωρίς αριθμούς
+                        history.push({ numbers: [], explanation: finalExplanation });
+                        
+                        return { gcd: gcd, steps: history }; // Σταμάτημα
+                    }
+                    
+                    // 4. Αν δεν ήταν το τελευταίο βήμα, συνεχίζουμε τον βρόχο
+                    currentNumbers = newNumbers;
+                    // <<< ΤΕΛΟΣ ΤΡΟΠΟΠΟΙΗΣΗΣ >>>
+                }
+            }
+
+            // Συνάρτηση "Υπολογισμός"
+            function handleCalculate() {
+                handleReset();
+
+                const inputValue = numbersInput.value;
+                if (!inputValue) {
+                    errorDiv.textContent = 'Παρακαλώ εισάγετε αριθμούς.';
+                    return;
+                }
+                
+                const numberStrings = inputValue
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(s => s.length > 0);
+
+                if (numberStrings.length === 0) {
+                    errorDiv.textContent = 'Δεν βρέθηκαν αριθμοί. Εισάγετε αριθμούς με κόμμα.';
+                    return;
+                }
+
+                const numbers = [];
+                const invalidEntries = [];
+                const numberRegex = /^\d+$/; 
+
+                for (const str of numberStrings) {
+                    if (numberRegex.test(str)) {
+                        numbers.push(parseInt(str, 10));
+                    } else {
+                        invalidEntries.push(str);
+                    }
+                }
+
+                if (invalidEntries.length > 0) {
+                    errorDiv.textContent = `Μη έγκυρες καταχωρήσεις: "${invalidEntries.join('", "')}". Παρακαλώ εισάγετε μόνο φυσικούς αριθμούς (π.χ. 12, 18), χωρισμένους με κόμμα.`;
+                    return;
+                }
+
+                let headerRow = '<tr>';
+                for (const num of numbers) {
+                    headerRow += `<th class="num-cell">${num}</th>`; 
+                }
+                headerRow += '<th>Επεξήγηση (Διαιρέσεις με τον μικρότερο)</th></tr>';
+                stepsHead.innerHTML = headerRow;
+
+                const result = findMKDWithSteps(numbers);
+
+                for (const step of result.steps) {
+                    let bodyRow = '<tr>';
+                    for (let i = 0; i < numbers.length; i++) {
+                        let num = step.numbers[i]; 
+                        // <<< ΑΛΛΑΓΗ ΕΔΩ: Αντί για '-', βάζουμε κενό string ''
+                        bodyRow += `<td class="num-cell">${num !== undefined ? num : ''}</td>`;
+                    }
+                    bodyRow += `<td class="explanation-cell">${step.explanation}</td></tr>`;
+                    stepsBody.innerHTML += bodyRow;
+                }
+
+                finalResultDiv.textContent = `Τελικός ΜΚΔ (${numbers.join(', ')}) = ${result.gcd}`;
+                resultContainer.style.display = 'block';
+            }
+
+            // Συνάρτηση για το κουμπί "Reset"
+            function handleReset() {
+                errorDiv.textContent = '';
+                finalResultDiv.textContent = '';
+                stepsHead.innerHTML = '';
+                stepsBody.innerHTML = '';
+                resultContainer.style.display = 'none';
+            }
+
+            calculateBtn.addEventListener('click', handleCalculate);
+            resetBtn.addEventListener('click', () => {
+                numbersInput.value = ''; 
+                handleReset();
+            });
+            
+            numbersInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    handleCalculate();
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
