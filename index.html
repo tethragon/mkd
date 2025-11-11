@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Υπολογισμός ΜΚΔ (Φιλικός προς Μαθητές)</title>
+    <title>Υπολογιστής & Δημιουργία Ασκήσεων ΜΚΔ</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -30,6 +30,12 @@
         h1 {
             color: #005a9c;
             margin-top: 0;
+        }
+        
+        h2 {
+            color: #005a9c;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0.5rem;
         }
 
         p {
@@ -104,7 +110,6 @@
         .num-cell {
             border-right: 2px solid #005a9c;
             font-weight: 600;
-            /* Ορίζουμε ένα min-height για τα κενά κελιά */
             min-height: 1.5em; 
         }
         
@@ -131,47 +136,149 @@
             font-weight: 600;
             margin-top: 1rem;
         }
+        
+        hr.solid-divider {
+            border: 0;
+            height: 2px;
+            background: #e0e0e0;
+            margin: 2.5rem 0;
+        }
+        
+        .generator-container {
+            text-align: left;
+        }
+        
+        .generator-container h2 {
+            text-align: center;
+        }
+        
+        .generator-inputs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .generator-inputs label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .generator-inputs input[type="number"] {
+            padding: 0.7rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 80px;
+        }
+        
+        #generateBtn {
+            background-color: #28a745;
+            color: white;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #exerciseResult {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px dashed #28a745;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .copy-btn {
+            background-color: #ffc107;
+            color: #333;
+            font-size: 0.8rem;
+            padding: 0.5rem 0.8rem;
+        }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Υπολογιστής ΜΚΔ (Μέθοδος Διαδοχικών Διαιρέσεων)</h1>
-        <p>Εισάγετε τους φυσικούς αριθμούς, χωρισμένους με κόμμα (π.χ. 15, 25, 30).</p>
-        
-        <input type="text" id="numbersInput" placeholder="π.χ. 12, 18, 24">
-        
-        <div class="button-group">
-            <button id="calculateBtn">Υπολογισμός ΜΚΔ</button>
-            <button id="resetBtn">Εκκαθάριση</button>
-        </div>
-        
-        <div id="resultContainer">
-            <h3>Βήματα Διαδικασίας</h3>
-            <table id="stepsTable">
-                <thead id="stepsHead">
-                </thead>
-                <tbody id="stepsBody">
-                </tbody>
-            </table>
-            <div id="finalResult"></div>
-        </div>
+        <div>
+            <h1>Υπολογιστής ΜΚΔ (Μέθοδος Διαδοχικών Διαιρέσεων)</h1>
+            <p>Εισάγετε τους φυσικούς αριθμούς, χωρισμένους με κόμμα (π.χ. 15, 25, 30).</p>
+            
+            <input type="text" id="numbersInput" placeholder="π.χ. 12, 18, 24">
+            
+            <div class="button-group">
+                <button id="calculateBtn">Υπολογισμός ΜΚΔ</button>
+                <button id="resetBtn">Εκκαθάριση</button>
+            </div>
+            
+            <div id="resultContainer">
+                <h3>Βήματα Διαδικασίας</h3>
+                <table id="stepsTable">
+                    <thead id="stepsHead">
+                    </thead>
+                    <tbody id="stepsBody">
+                    </tbody>
+                </table>
+                <div id="finalResult"></div>
+            </div>
 
-        <div id="error"></div>
+            <div id="error"></div>
+        </div>
+        
+        <hr class="solid-divider">
+
+        <div class="generator-container">
+            <h2>Δημιουργία Άσκησης</h2>
+            <div class="generator-inputs">
+                <div>
+                    <label for="desiredGcd">Επιθυμητός ΜΚΔ:</label>
+                    <input type="number" id="desiredGcd" value="10" min="2">
+                </div>
+                <div>
+                    <label for="numberCount">Πλήθος Αριθμών:</label>
+                    <input type="number" id="numberCount" value="3" min="2">
+                </div>
+            </div>
+            <button id="generateBtn">Δημιουργία Άσκησης</button>
+            <div id="exerciseResult">
+            </div>
+        </div>
+        
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             
+            // --- ΣΤΟΙΧΕΙΑ ΥΠΟΛΟΓΙΣΤΗ ---
             const numbersInput = document.getElementById('numbersInput');
             const calculateBtn = document.getElementById('calculateBtn');
             const resetBtn = document.getElementById('resetBtn');
-            
             const resultContainer = document.getElementById('resultContainer');
             const stepsHead = document.getElementById('stepsHead');
             const stepsBody = document.getElementById('stepsBody');
             const finalResultDiv = document.getElementById('finalResult');
             const errorDiv = document.getElementById('error');
+            
+            // --- ΣΤΟΙΧΕΙΑ ΓΕΝΝΗΤΡΙΑΣ ---
+            const desiredGcdInput = document.getElementById('desiredGcd');
+            const numberCountInput = document.getElementById('numberCount');
+            const generateBtn = document.getElementById('generateBtn');
+            const exerciseResultDiv = document.getElementById('exerciseResult');
+
+            function gcd(a, b) {
+                while (b) {
+                    [a, b] = [b, a % b];
+                }
+                return a;
+            }
+
+            function gcdList(arr) {
+                if (arr.length === 0) return 1;
+                return arr.reduce((a, b) => gcd(a, b));
+            }
 
             function findMKDWithSteps(initialNumbers) {
                 let history = []; 
@@ -194,7 +301,6 @@
 
                 while (true) {
                     const minVal = Math.min(...currentNumbers.filter(n => n > 0));
-                    
                     let minFound = false; 
                     let explanations = []; 
                     
@@ -204,7 +310,6 @@
                             minFound = true;
                             return n; 
                         }
-                        
                         let rem = n % minVal; 
                         if (n !== 0 && (n !== minVal || minFound)) {
                              let quotient = Math.floor(n / minVal); 
@@ -214,39 +319,25 @@
                     });
 
                     let explanationString = `Μικρότερος: <strong>${minVal}</strong>. ${explanations.join(', ')}`;
-                    
-                    // <<< ΑΡΧΗ ΤΡΟΠΟΠΟΙΗΣΗΣ >>>
-                    
-                    // 1. Πάντα αποθηκεύουμε το βήμα υπολογισμού
                     history.push({ numbers: newNumbers, explanation: explanationString });
                     
-                    // 2. Ελέγχουμε *μετά* αν αυτό ήταν το τελευταίο βήμα
                     let nonZerosInNew = newNumbers.filter(n => n > 0);
                     
                     if (nonZerosInNew.length <= 1) {
-                        // Αν ναι, βρήκαμε τον ΜΚΔ
                         let gcd = nonZerosInNew.length === 1 ? nonZerosInNew[0] : 0;
                         let finalExplanation;
-                        
                         if (gcd === 0) {
                             finalExplanation = "Όλοι οι αριθμοί είναι 0. ΜΚΔ = 0";
                         } else {
                             finalExplanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
                         }
-                        
-                        // 3. Προσθέτουμε μια ΝΕΑ, ΤΕΛΙΚΗ σειρά, χωρίς αριθμούς
                         history.push({ numbers: [], explanation: finalExplanation });
-                        
-                        return { gcd: gcd, steps: history }; // Σταμάτημα
+                        return { gcd: gcd, steps: history };
                     }
-                    
-                    // 4. Αν δεν ήταν το τελευταίο βήμα, συνεχίζουμε τον βρόχο
                     currentNumbers = newNumbers;
-                    // <<< ΤΕΛΟΣ ΤΡΟΠΟΠΟΙΗΣΗΣ >>>
                 }
             }
 
-            // Συνάρτηση "Υπολογισμός"
             function handleCalculate() {
                 handleReset();
 
@@ -296,7 +387,6 @@
                     let bodyRow = '<tr>';
                     for (let i = 0; i < numbers.length; i++) {
                         let num = step.numbers[i]; 
-                        // <<< ΑΛΛΑΓΗ ΕΔΩ: Αντί για '-', βάζουμε κενό string ''
                         bodyRow += `<td class="num-cell">${num !== undefined ? num : ''}</td>`;
                     }
                     bodyRow += `<td class="explanation-cell">${step.explanation}</td></tr>`;
@@ -307,7 +397,6 @@
                 resultContainer.style.display = 'block';
             }
 
-            // Συνάρτηση για το κουμπί "Reset"
             function handleReset() {
                 errorDiv.textContent = '';
                 finalResultDiv.textContent = '';
@@ -315,19 +404,109 @@
                 stepsBody.innerHTML = '';
                 resultContainer.style.display = 'none';
             }
+            
+            // --- ΤΡΟΠΟΠΟΙΗΜΕΝΗ ΣΥΝΑΡΤΗΣΗ ΓΕΝΝΗΤΡΙΑΣ ---
+            function handleGenerateExercise() {
+                const G = parseInt(desiredGcdInput.value, 10);
+                const N = parseInt(numberCountInput.value, 10);
+                exerciseResultDiv.textContent = '';
+                exerciseResultDiv.style.display = 'none';
+
+                if (isNaN(G) || G <= 0) {
+                    exerciseResultDiv.innerHTML = '<span>Παρακαλώ εισάγετε έγκυρο ΜΚΔ ( > 0).</span>';
+                    exerciseResultDiv.style.display = 'flex';
+                    return;
+                }
+                if (isNaN(N) || N < 2) {
+                    exerciseResultDiv.innerHTML = '<span>Παρακαλώ εισάγετε πλήθος αριθμών ( >= 2).</span>';
+                    exerciseResultDiv.style.display = 'flex';
+                    return;
+                }
+
+                // 2. Αλγόριθμος Δημιουργίας (με έλεγχο μοναδικότητας)
+                const multipliers = [];
+                const usedMultipliers = new Set(); // Set για έλεγχο μοναδικότητας
+                const minMult = 2; // Ελάχιστος πολλαπλασιαστής
+                const maxMult = 20; // Μέγιστος πολλαπλασιαστής (Αυξήθηκε)
+                let attempts = 0; // Ασφάλεια για αποφυγή άπειρου βρόχου
+                
+                // Έλεγχος αν ζητάμε περισσότερους αριθμούς από όσους υπάρχουν
+                const maxAvailableMultipliers = maxMult - minMult + 1;
+                if (N > maxAvailableMultipliers) {
+                    exerciseResultDiv.innerHTML = `<span>Δεν μπορεί να δημιουργηθεί άσκηση με ${N} μοναδικούς αριθμούς (Μέγιστο: ${maxAvailableMultipliers}). Μειώστε το πλήθος.</span>`;
+                    exerciseResultDiv.style.display = 'flex';
+                    return;
+                }
+
+                // Δημιουργία N-1 *μοναδικών* πολλαπλασιαστών
+                while (multipliers.length < N - 1 && attempts < 200) {
+                    let m = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
+                    if (!usedMultipliers.has(m)) {
+                        multipliers.push(m);
+                        usedMultipliers.add(m);
+                    }
+                    attempts++;
+                }
+
+                // Εύρεση του ΜΚΔ αυτών των N-1
+                const g_temp = gcdList(multipliers);
+
+                // Εύρεση τελικού πολλαπλασιαστή (m1) που είναι *μοναδικός* και σχετικά πρώτος με τον g_temp
+                let m1;
+                attempts = 0; // Επαναφορά μετρητή
+                do {
+                    m1 = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
+                    attempts++;
+                    if (attempts > 100) { // Failsafe
+                        m1 = minMult; // Ξεκίνα από τον μικρότερο
+                        while(attempts < 300) { // Τελική ασφάλεια
+                             // Βρες έναν που δεν είναι στο set ΚΑΙ είναι σχετικά πρώτος
+                             if (!usedMultipliers.has(m1) && gcd(m1, g_temp) === 1) break;
+                             m1++;
+                             attempts++;
+                             if (m1 > maxMult + 10) { // Αν δεν βρει με τίποτα...
+                                 m1 = minMult; // ...πάρε απλά τον επόμενο διαθέσιμο
+                                 while(usedMultipliers.has(m1)) m1++;
+                                 break;
+                             }
+                        }
+                        break; 
+                    }
+                } while (gcd(m1, g_temp) !== 1 || usedMultipliers.has(m1)); // Έλεγχος ΚΑΙ μοναδικότητας
+
+                multipliers.push(m1); // Προσθήκη του τελικού
+
+                const finalNumbers = multipliers.map(m => m * G);
+                const numbersString = finalNumbers.join(', ');
+
+                exerciseResultDiv.innerHTML = `
+                    <span><strong>Άσκηση:</strong> Βρείτε τον ΜΚΔ των <strong>${numbersString}</strong>. (Απάντηση: ${G})</span>
+                    <button id="copyToCalcBtn" class="copy-btn" title="Αντιγραφή στον Υπολογιστή για έλεγχο">Αντιγραφή ↑</button>
+                `;
+                exerciseResultDiv.style.display = 'flex';
+
+                document.getElementById('copyToCalcBtn').addEventListener('click', () => {
+                    numbersInput.value = numbersString;
+                    handleCalculate(); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                });
+            }
+            // --- ΤΕΛΟΣ ΤΡΟΠΟΠΟΙΗΜΕΝΗΣ ΣΥΝΑΡΤΗΣΗΣ ---
+
 
             calculateBtn.addEventListener('click', handleCalculate);
             resetBtn.addEventListener('click', () => {
                 numbersInput.value = ''; 
                 handleReset();
             });
-            
             numbersInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
                     event.preventDefault(); 
                     handleCalculate();
                 }
             });
+            
+            generateBtn.addEventListener('click', handleGenerateExercise);
 
         });
     </script>
