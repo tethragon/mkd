@@ -19,17 +19,52 @@
 
         .container {
             background-color: #ffffff;
-            padding: 2rem;
+            padding: 2.2rem 2rem 2rem 2rem;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
             width: 90%;
             max-width: 700px;
             text-align: center;
+            position: relative;
+        }
+
+        /* Κουμπί Πληροφοριών / Modal Trigger */
+        .info-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f0f4f8;
+            border: 1px solid #d0d7de;
+            color: #005a9c;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .info-btn:hover {
+            background-color: #005a9c;
+            color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        .info-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
 
         h1 {
             color: #005a9c;
             margin-top: 0;
+            padding-right: 1.5rem;
+            font-size: 1.7rem;
         }
         
         h2 {
@@ -51,6 +86,7 @@
             border-radius: 8px;
             border: 1px solid #ddd;
             margin-bottom: 1rem;
+            box-sizing: border-box;
         }
 
         .button-group {
@@ -74,9 +110,17 @@
             color: white;
         }
 
+        #calculateBtn:hover {
+            background-color: #0069d9;
+        }
+
         #resetBtn {
             background-color: #dc3545;
             color: white;
+        }
+
+        #resetBtn:hover {
+            background-color: #c82333;
         }
 
         #resultContainer {
@@ -179,6 +223,10 @@
             display: block;
             margin: 0 auto;
         }
+
+        #generateBtn:hover {
+            background-color: #218838;
+        }
         
         #exerciseResult {
             margin-top: 1.5rem;
@@ -198,11 +246,181 @@
             padding: 0.5rem 0.8rem;
         }
 
+        .copy-btn:hover {
+            background-color: #e0a800;
+        }
+
+        /* --- STYLES ΓΙΑ ΤΟ MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+            position: relative;
+            text-align: left;
+            animation: modalFadeIn 0.25s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            font-size: 1.4rem;
+            color: #777;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            color: #dc3545;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #005a9c;
+            font-size: 1.3rem;
+        }
+
+        .modal-row {
+            margin-bottom: 0.9rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .modal-label {
+            font-weight: 700;
+            color: #005a9c;
+            display: inline-block;
+            min-width: 145px;
+            text-transform: uppercase;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-version {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #005a9c;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-weight: 700;
+            border: 1px solid #b6d4fe;
+        }
+
+        .badge-architect {
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: 0.5px;
+        }
+
+        .license-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 0.9rem;
+            border-radius: 6px;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: #444;
+        }
+
+        .license-card strong {
+            color: #1e7e34;
+        }
+
+        .license-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+        }
+
+        .license-badge {
+            display: inline-block;
+            background: #28a745;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+        }
+
+        .copyright-text {
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 0.4rem;
+            font-size: 0.88rem;
+        }
+
+        .license-card a {
+            color: #005a9c;
+            text-decoration: underline;
+        }
+
+        .modal-footer {
+            margin-top: 1.5rem;
+            text-align: right;
+        }
+
+        .modal-action-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-action-btn:hover {
+            background-color: #0069d9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Κουμπί ανοίγματος Modal Πληροφοριών -->
+        <button id="infoModalBtn" class="info-btn" title="Πληροφορίες & Έκδοση">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+        </button>
+
         <div>
             <h1>Υπολογιστής ΜΚΔ (Μέθοδος Διαδοχικών Διαιρέσεων)</h1>
             <p>Εισάγετε τους φυσικούς αριθμούς, χωρισμένους με κόμμα (π.χ. 15, 25, 30).</p>
@@ -246,12 +464,97 @@
             <div id="exerciseResult">
             </div>
         </div>
-        
+    </div>
+
+    <!-- MODAL ΠΛΗΡΟΦΟΡΙΩΝ ΕΦΑΡΜΟΓΗΣ -->
+    <div id="aboutModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="modalCloseX" aria-label="Κλείσιμο">&times;</button>
+            
+            <div class="modal-header">
+                <h3 id="modalTitle">Ταυτότητα Εφαρμογής</h3>
+            </div>
+            
+            <div class="modal-row">
+                <span class="modal-label">Program Architect:</span>
+                <span class="badge-architect">GEORGE PETRAKIS</span>
+            </div>
+            
+            <div class="modal-row">
+                <span class="modal-label">Έκδοση (Version):</span>
+                <span id="appVersionDisplay" class="badge-version">v...</span>
+            </div>
+
+            <div class="license-card">
+                <div class="license-header-row">
+                    <strong>GNU General Public License v3.0</strong>
+                    <span class="license-badge">GPL-3.0</span>
+                </div>
+                <div class="copyright-text">
+                    Copyright &copy; 2025 GEORGE PETRAKIS
+                </div>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.82rem; color: #555; line-height: 1.45;">
+                    Το παρόν πρόγραμμα αποτελεί ελεύθερο λογισμικό υπό τους όρους της άδειας <strong>GNU GPLv3</strong>. 
+                    Μπορείτε να το αναδιανείμετε ή/και να το τροποποιήσετε ελεύθερα με βάση τις προβλέψεις της άδειας.
+                    <br><a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">Ανάγνωση πλήρους κειμένου άδειας GPLv3 &rarr;</a>
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modalCloseBtn" class="modal-action-btn">Κλείσιμο</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        /*******************************************************************************
+         * ============================================================================
+         *                       ΡΥΘΜΙΣΕΙΣ ΕΚΔΟΣΗΣ ΕΦΑΡΜΟΓΗΣ
+         * ============================================================================
+         * Αλλάξτε καρφωτά την παρακάτω τιμή για να ανανεωθεί η έκδοση στο Modal
+         * και σε όλη την εφαρμογή.
+         ******************************************************************************/
+        const APP_VERSION = "2.1.1"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
+        /******************************************************************************/
+
         document.addEventListener('DOMContentLoaded', (event) => {
             
+            // --- ΣΤΟΙΧΕΙΑ MODAL & ΕΚΔΟΣΗΣ ---
+            const aboutModal = document.getElementById('aboutModal');
+            const infoModalBtn = document.getElementById('infoModalBtn');
+            const modalCloseX = document.getElementById('modalCloseX');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const appVersionDisplay = document.getElementById('appVersionDisplay');
+
+            // Προβολή της έκδοσης στο Modal
+            if (appVersionDisplay) {
+                appVersionDisplay.textContent = `v${APP_VERSION}`;
+            }
+
+            function openModal() {
+                aboutModal.style.display = 'flex';
+            }
+
+            function closeModal() {
+                aboutModal.style.display = 'none';
+            }
+
+            infoModalBtn.addEventListener('click', openModal);
+            modalCloseX.addEventListener('click', closeModal);
+            modalCloseBtn.addEventListener('click', closeModal);
+            
+            aboutModal.addEventListener('click', (e) => {
+                if (e.target === aboutModal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && aboutModal.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+
             // --- ΣΤΟΙΧΕΙΑ ΥΠΟΛΟΓΙΣΤΗ ---
             const numbersInput = document.getElementById('numbersInput');
             const calculateBtn = document.getElementById('calculateBtn');
@@ -262,6 +565,17 @@
             const finalResultDiv = document.getElementById('finalResult');
             const errorDiv = document.getElementById('error');
             
+            // --- ΑΥΤΟΜΑΤΗ ΜΕΤΑΤΡΟΠΗ ΤΕΛΕΙΑΣ ΣΕ ΚΟΜΜΑ (NUMPAD FRIENDLY) ---
+            numbersInput.addEventListener('input', (e) => {
+                const cursorPos = e.target.selectionStart;
+                const originalValue = e.target.value;
+                if (originalValue.includes('.')) {
+                    // Αντικατάσταση όλων των τελειών με κόμματα διατηρώντας τη θέση του κέρσορα
+                    e.target.value = originalValue.replace(/\./g, ',');
+                    e.target.setSelectionRange(cursorPos, cursorPos);
+                }
+            });
+
             // --- ΣΤΟΙΧΕΙΑ ΓΕΝΝΗΤΡΙΑΣ ---
             const desiredGcdInput = document.getElementById('desiredGcd');
             const numberCountInput = document.getElementById('numberCount');
@@ -286,17 +600,17 @@
                 
                 let initialNonZeros = currentNumbers.filter(n => n > 0);
                 if (initialNonZeros.length <= 1) {
-                    let gcd = initialNonZeros.length === 1 ? initialNonZeros[0] : 0;
+                    let gcdVal = initialNonZeros.length === 1 ? initialNonZeros[0] : 0;
                     let explanation;
                     if (initialNonZeros.length === 0) {
                         explanation = "Όλοι οι αριθμοί είναι 0. ΜΚΔ = 0";
                     } else if (initialNumbers.length > 1) {
-                         explanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                         explanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcdVal}</strong>`;
                     } else {
-                         explanation = `Μόνο ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                         explanation = `Μόνο ένας αριθμός. <strong>ΜΚΔ = ${gcdVal}</strong>`;
                     }
                     history.push({ numbers: currentNumbers, explanation: explanation });
-                    return { gcd: gcd, steps: history };
+                    return { gcd: gcdVal, steps: history };
                 }
 
                 while (true) {
@@ -324,15 +638,15 @@
                     let nonZerosInNew = newNumbers.filter(n => n > 0);
                     
                     if (nonZerosInNew.length <= 1) {
-                        let gcd = nonZerosInNew.length === 1 ? nonZerosInNew[0] : 0;
+                        let gcdVal = nonZerosInNew.length === 1 ? nonZerosInNew[0] : 0;
                         let finalExplanation;
-                        if (gcd === 0) {
+                        if (gcdVal === 0) {
                             finalExplanation = "Όλοι οι αριθμοί είναι 0. ΜΚΔ = 0";
                         } else {
-                            finalExplanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcd}</strong>`;
+                            finalExplanation = `Απομένει ένας αριθμός. <strong>ΜΚΔ = ${gcdVal}</strong>`;
                         }
                         history.push({ numbers: [], explanation: finalExplanation });
-                        return { gcd: gcd, steps: history };
+                        return { gcd: gcdVal, steps: history };
                     }
                     currentNumbers = newNumbers;
                 }
@@ -405,7 +719,7 @@
                 resultContainer.style.display = 'none';
             }
             
-            // --- ΤΡΟΠΟΠΟΙΗΜΕΝΗ ΣΥΝΑΡΤΗΣΗ ΓΕΝΝΗΤΡΙΑΣ ---
+            // --- ΣΥΝΑΡΤΗΣΗ ΓΕΝΝΗΤΡΙΑΣ ---
             function handleGenerateExercise() {
                 const G = parseInt(desiredGcdInput.value, 10);
                 const N = parseInt(numberCountInput.value, 10);
@@ -423,14 +737,12 @@
                     return;
                 }
 
-                // 2. Αλγόριθμος Δημιουργίας (με έλεγχο μοναδικότητας)
                 const multipliers = [];
-                const usedMultipliers = new Set(); // Set για έλεγχο μοναδικότητας
-                const minMult = 2; // Ελάχιστος πολλαπλασιαστής
-                const maxMult = 20; // Μέγιστος πολλαπλασιαστής (Αυξήθηκε)
-                let attempts = 0; // Ασφάλεια για αποφυγή άπειρου βρόχου
+                const usedMultipliers = new Set();
+                const minMult = 2;
+                const maxMult = 20;
+                let attempts = 0;
                 
-                // Έλεγχος αν ζητάμε περισσότερους αριθμούς από όσους υπάρχουν
                 const maxAvailableMultipliers = maxMult - minMult + 1;
                 if (N > maxAvailableMultipliers) {
                     exerciseResultDiv.innerHTML = `<span>Δεν μπορεί να δημιουργηθεί άσκηση με ${N} μοναδικούς αριθμούς (Μέγιστο: ${maxAvailableMultipliers}). Μειώστε το πλήθος.</span>`;
@@ -438,7 +750,6 @@
                     return;
                 }
 
-                // Δημιουργία N-1 *μοναδικών* πολλαπλασιαστών
                 while (multipliers.length < N - 1 && attempts < 200) {
                     let m = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
                     if (!usedMultipliers.has(m)) {
@@ -448,33 +759,30 @@
                     attempts++;
                 }
 
-                // Εύρεση του ΜΚΔ αυτών των N-1
                 const g_temp = gcdList(multipliers);
 
-                // Εύρεση τελικού πολλαπλασιαστή (m1) που είναι *μοναδικός* και σχετικά πρώτος με τον g_temp
                 let m1;
-                attempts = 0; // Επαναφορά μετρητή
+                attempts = 0;
                 do {
                     m1 = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
                     attempts++;
-                    if (attempts > 100) { // Failsafe
-                        m1 = minMult; // Ξεκίνα από τον μικρότερο
-                        while(attempts < 300) { // Τελική ασφάλεια
-                             // Βρες έναν που δεν είναι στο set ΚΑΙ είναι σχετικά πρώτος
+                    if (attempts > 100) {
+                        m1 = minMult;
+                        while(attempts < 300) {
                              if (!usedMultipliers.has(m1) && gcd(m1, g_temp) === 1) break;
                              m1++;
                              attempts++;
-                             if (m1 > maxMult + 10) { // Αν δεν βρει με τίποτα...
-                                 m1 = minMult; // ...πάρε απλά τον επόμενο διαθέσιμο
+                             if (m1 > maxMult + 10) {
+                                 m1 = minMult;
                                  while(usedMultipliers.has(m1)) m1++;
                                  break;
                              }
                         }
                         break; 
                     }
-                } while (gcd(m1, g_temp) !== 1 || usedMultipliers.has(m1)); // Έλεγχος ΚΑΙ μοναδικότητας
+                } while (gcd(m1, g_temp) !== 1 || usedMultipliers.has(m1));
 
-                multipliers.push(m1); // Προσθήκη του τελικού
+                multipliers.push(m1);
 
                 const finalNumbers = multipliers.map(m => m * G);
                 const numbersString = finalNumbers.join(', ');
@@ -491,8 +799,6 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' }); 
                 });
             }
-            // --- ΤΕΛΟΣ ΤΡΟΠΟΠΟΙΗΜΕΝΗΣ ΣΥΝΑΡΤΗΣΗΣ ---
-
 
             calculateBtn.addEventListener('click', handleCalculate);
             resetBtn.addEventListener('click', () => {
