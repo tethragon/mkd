@@ -148,6 +148,47 @@
             text-align: left;
         }
 
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .result-header h3 {
+            margin: 0;
+            color: #005a9c;
+        }
+
+        .copy-solution-btn {
+            background-color: #f0f4f8;
+            border: 1px solid #b6d4fe;
+            color: #005a9c;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-solution-btn:hover {
+            background-color: #005a9c;
+            color: #ffffff;
+            border-color: #005a9c;
+        }
+
+        .copy-solution-btn.copied {
+            background-color: #28a745;
+            color: #ffffff;
+            border-color: #28a745;
+        }
+
         #stepsTable {
             width: 100%;
             border-collapse: collapse;
@@ -217,23 +258,44 @@
         
         .generator-inputs {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .generator-field {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 1rem;
+            gap: 0.4rem;
         }
         
-        .generator-inputs label {
+        .generator-field label {
             font-weight: 600;
+            font-size: 0.92rem;
             color: #333;
+            text-align: center;
+            white-space: nowrap;
         }
         
-        .generator-inputs input[type="number"] {
-            padding: 0.7rem;
+        .generator-field input[type="number"] {
+            padding: 0.65rem 0.5rem;
             font-size: 1rem;
             border-radius: 8px;
             border: 1px solid #ddd;
-            width: 80px;
+            width: 85px;
+            text-align: center;
+            box-sizing: border-box;
+            background-color: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .generator-field input[type="number"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
         }
         
         #generateBtn {
@@ -453,7 +515,15 @@
             </div>
             
             <div id="resultContainer">
-                <h3>Βήματα Διαδικασίας</h3>
+                <div class="result-header">
+                    <h3>Βήματα Διαδικασίας</h3>
+                    <button id="copySolutionBtn" class="copy-solution-btn" title="Αντιγραφή πίνακα και ΜΚΔ για Word ή Text Editor">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        <span>Αντιγραφή Βημάτων & ΜΚΔ</span>
+                    </button>
+                </div>
                 <table id="stepsTable">
                     <thead id="stepsHead">
                     </thead>
@@ -471,13 +541,17 @@
         <div class="generator-container">
             <h2>Δημιουργία Άσκησης</h2>
             <div class="generator-inputs">
-                <div>
+                <div class="generator-field">
                     <label for="desiredGcd">Επιθυμητός ΜΚΔ:</label>
                     <input type="number" id="desiredGcd" value="10" min="2">
                 </div>
-                <div>
+                <div class="generator-field">
                     <label for="numberCount">Πλήθος Αριθμών:</label>
                     <input type="number" id="numberCount" value="3" min="2">
+                </div>
+                <div class="generator-field">
+                    <label for="stepCount" title="Πλήθος γραμμών στον πίνακα βημάτων">Γραμμές Βημάτων:</label>
+                    <input type="number" id="stepCount" placeholder="Όλες" min="2" max="8" title="Αφήστε κενό για οποιοδήποτε πλήθος γραμμών">
                 </div>
             </div>
             <button id="generateBtn">Δημιουργία Άσκησης</button>
@@ -534,7 +608,7 @@
          * Αλλάξτε καρφωτά την παρακάτω τιμή για να ανανεωθεί η έκδοση στο Modal
          * και σε όλη την εφαρμογή.
          ******************************************************************************/
-        const APP_VERSION = "2.1.3"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
+        const APP_VERSION = "2.2.1"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
         /******************************************************************************/
 
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -584,7 +658,10 @@
             const stepsBody = document.getElementById('stepsBody');
             const finalResultDiv = document.getElementById('finalResult');
             const errorDiv = document.getElementById('error');
-            
+            const copySolutionBtn = document.getElementById('copySolutionBtn');
+
+            let currentCalculation = null;
+
             // --- ΑΥΤΟΜΑΤΗ ΜΕΤΑΤΡΟΠΗ ΤΕΛΕΙΑΣ ΣΕ ΚΟΜΜΑ (NUMPAD FRIENDLY) ---
             numbersInput.addEventListener('input', (e) => {
                 const cursorPos = e.target.selectionStart;
@@ -599,6 +676,7 @@
             // --- ΣΤΟΙΧΕΙΑ ΓΕΝΝΗΤΡΙΑΣ ---
             const desiredGcdInput = document.getElementById('desiredGcd');
             const numberCountInput = document.getElementById('numberCount');
+            const stepCountInput = document.getElementById('stepCount');
             const generateBtn = document.getElementById('generateBtn');
             const exerciseResultDiv = document.getElementById('exerciseResult');
 
@@ -727,7 +805,12 @@
                     stepsBody.innerHTML += bodyRow;
                 }
 
-                finalResultDiv.textContent = `Τελικός ΜΚΔ (${numbers.join(', ')}) = ${result.gcd}`;
+                finalResultDiv.textContent = `ΜΚΔ (${numbers.join(', ')}) = ${result.gcd}`;
+                currentCalculation = {
+                    numbers: [...numbers],
+                    steps: result.steps,
+                    gcdText: finalResultDiv.textContent
+                };
                 resultContainer.style.display = 'block';
             }
 
@@ -736,13 +819,142 @@
                 finalResultDiv.textContent = '';
                 stepsHead.innerHTML = '';
                 stepsBody.innerHTML = '';
+                currentCalculation = null;
                 resultContainer.style.display = 'none';
             }
-            
-            // --- ΣΥΝΑΡΤΗΣΗ ΓΕΝΝΗΤΡΙΑΣ ---
+
+            // --- ΜΟΡΦΟΠΟΙΗΣΗ ΓΙΑ ΑΝΤΙΓΡΑΦΗ ΣΤΟ WORD / WRITER (HTML) ---
+            function generateWordHtmlTable(numbers, steps, gcdText) {
+                let html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 680px; font-family: \'SFMono-Regular\', Consolas, \'Liberation Mono\', Menlo, monospace; font-size: 14px; margin-top: 8px; margin-bottom: 14px;">';
+                
+                // Colgroup για ρητή διανομή διαστάσεων στηλών στο LibreOffice Writer & Word
+                html += '<colgroup>';
+                for (let i = 0; i < numbers.length; i++) {
+                    html += '<col width="80" style="width: 80px; min-width: 65px;">';
+                }
+                html += '<col style="width: auto;">';
+                html += '</colgroup>';
+
+                // Κεφαλίδα
+                html += '<thead><tr>';
+                for (let i = 0; i < numbers.length; i++) {
+                    html += `<th width="80" style="width: 80px; min-width: 65px; border: 1px solid #ddd; border-right: 2px solid #005a9c; background-color: #f0f8ff; color: #005a9c; font-weight: 700; padding: 8px 10px; text-align: center; white-space: nowrap;">${numbers[i]}</th>`;
+                }
+                html += '<th style="border: 1px solid #ddd; background-color: #f0f8ff; color: #005a9c; font-weight: 700; padding: 8px 12px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;">Επεξήγηση (Διαιρέσεις με τον μικρότερο)</th>';
+                html += '</tr></thead>';
+
+                // Γραμμές Βημάτων
+                html += '<tbody>';
+                for (const step of steps) {
+                    html += '<tr>';
+                    for (let i = 0; i < numbers.length; i++) {
+                        const num = step.numbers[i] !== undefined ? step.numbers[i] : '';
+                        html += `<td width="80" style="width: 80px; min-width: 65px; border: 1px solid #ddd; border-right: 2px solid #005a9c; font-weight: 600; padding: 8px 10px; text-align: center; white-space: nowrap;">${num}</td>`;
+                    }
+                    html += `<td style="border: 1px solid #ddd; border-left: 2px solid #005a9c; background-color: #f8f9fa; font-style: italic; font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 13px; line-height: 1.5; padding: 8px 12px; text-align: left;">${step.explanation}</td>`;
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+
+                // Γραμμή ΜΚΔ
+                html += `<div style="margin-top: 14px; font-size: 18px; font-weight: 700; color: #28a745; text-align: center; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Arial, sans-serif;">${gcdText}</div>`;
+
+                return html;
+            }
+
+            // --- ΜΟΡΦΟΠΟΙΗΣΗ ΓΙΑ ΑΝΤΙΓΡΑΦΗ ΣΕ TEXT EDITOR (PLAIN TEXT TABLE) ---
+            function generatePlainTextTable(numbers, steps, gcdText) {
+                const colWidths = numbers.map((n, i) => {
+                    let maxLen = String(n).length;
+                    for (const s of steps) {
+                        const val = s.numbers[i] !== undefined ? String(s.numbers[i]) : '';
+                        if (val.length > maxLen) maxLen = val.length;
+                    }
+                    return Math.max(maxLen + 2, 6);
+                });
+
+                const expHeader = "Επεξήγηση (Διαιρέσεις με τον μικρότερο)";
+                const cleanExplanations = steps.map(s => {
+                    return (s.explanation || '').replace(/<[^>]*>/g, '');
+                });
+                let maxExpLen = expHeader.length;
+                for (const exp of cleanExplanations) {
+                    if (exp.length > maxExpLen) maxExpLen = exp.length;
+                }
+                const expWidth = Math.max(maxExpLen + 2, 42);
+
+                const padCenter = (str, width) => {
+                    const totalPad = Math.max(0, width - str.length);
+                    const padLeft = Math.floor(totalPad / 2);
+                    const padRight = totalPad - padLeft;
+                    return ' '.repeat(padLeft) + str + ' '.repeat(padRight);
+                };
+
+                const padLeftAlign = (str, width) => {
+                    const extra = Math.max(0, width - str.length - 1);
+                    return ' ' + str + ' '.repeat(extra);
+                };
+
+                const lines = [];
+
+                // Άνω περίγραμμα
+                lines.push('┌' + colWidths.map(w => '─'.repeat(w)).join('┬') + '┬' + '─'.repeat(expWidth) + '┐');
+                // Κεφαλίδα
+                lines.push('│' + numbers.map((n, i) => padCenter(String(n), colWidths[i])).join('│') + '│' + padLeftAlign(expHeader, expWidth) + '│');
+                // Διαχωριστικό
+                lines.push('├' + colWidths.map(w => '─'.repeat(w)).join('┼') + '┼' + '─'.repeat(expWidth) + '┤');
+
+                // Γραμμές
+                for (let rowIdx = 0; rowIdx < steps.length; rowIdx++) {
+                    const step = steps[rowIdx];
+                    const rowCells = numbers.map((_, i) => {
+                        const val = step.numbers[i] !== undefined ? String(step.numbers[i]) : '';
+                        return padCenter(val, colWidths[i]);
+                    });
+                    const expCell = padLeftAlign(cleanExplanations[rowIdx], expWidth);
+                    lines.push('│' + rowCells.join('│') + '│' + expCell + '│');
+                }
+
+                // Κάτω περίγραμμα
+                lines.push('└' + colWidths.map(w => '─'.repeat(w)).join('┴') + '┴' + '─'.repeat(expWidth) + '┘');
+                lines.push('');
+                lines.push(gcdText);
+
+                return lines.join('\n');
+            }
+
+            // --- ΑΝΤΙΓΡΑΦΗ ΜΕ ΠΟΛΛΑΠΛΑ MIME TYPES (HTML + FALLBACK PLAIN TEXT) ---
+            async function copyFormattedSolution(htmlContent, plainTextContent) {
+                if (navigator.clipboard && window.ClipboardItem) {
+                    try {
+                        const item = new ClipboardItem({
+                            'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                            'text/plain': new Blob([plainTextContent], { type: 'text/plain' })
+                        });
+                        await navigator.clipboard.write([item]);
+                        return true;
+                    } catch (err) {
+                        console.warn('ClipboardItem write failed, fallback to copy event:', err);
+                    }
+                }
+                const listener = (e) => {
+                    e.preventDefault();
+                    e.clipboardData.setData('text/html', htmlContent);
+                    e.clipboardData.setData('text/plain', plainTextContent);
+                };
+                document.addEventListener('copy', listener);
+                const successful = document.execCommand('copy');
+                document.removeEventListener('copy', listener);
+                return successful;
+            }
+
+            // --- ΣΥΝΑΡΤΗΣΗ ΓΕΝΝΗΤΡΙΑΣ ΜΕ ΕΠΙΛΟΓΗ ΓΡΑΜΜΩΝ ---
             function handleGenerateExercise() {
                 const G = parseInt(desiredGcdInput.value, 10);
                 const N = parseInt(numberCountInput.value, 10);
+                const stepCountVal = stepCountInput.value.trim();
+                const targetSteps = stepCountVal ? parseInt(stepCountVal, 10) : null;
+
                 exerciseResultDiv.textContent = '';
                 exerciseResultDiv.style.display = 'none';
 
@@ -756,59 +968,104 @@
                     exerciseResultDiv.style.display = 'flex';
                     return;
                 }
-
-                const multipliers = [];
-                const usedMultipliers = new Set();
-                const minMult = 2;
-                const maxMult = 20;
-                let attempts = 0;
-                
-                const maxAvailableMultipliers = maxMult - minMult + 1;
-                if (N > maxAvailableMultipliers) {
-                    exerciseResultDiv.innerHTML = `<span>Δεν μπορεί να δημιουργηθεί άσκηση με ${N} μοναδικούς αριθμούς (Μέγιστο: ${maxAvailableMultipliers}). Μειώστε το πλήθος.</span>`;
+                if (targetSteps !== null && (isNaN(targetSteps) || targetSteps < 2)) {
+                    exerciseResultDiv.innerHTML = '<span>Παρακαλώ εισάγετε έγκυρο πλήθος γραμμών ( >= 2) ή αφήστε το κενό.</span>';
                     exerciseResultDiv.style.display = 'flex';
                     return;
                 }
 
-                while (multipliers.length < N - 1 && attempts < 200) {
-                    let m = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
-                    if (!usedMultipliers.has(m)) {
-                        multipliers.push(m);
-                        usedMultipliers.add(m);
+                function tryGenerateCandidate(maxMult) {
+                    const minMult = 2;
+                    if (N > maxMult - minMult + 1) return null;
+
+                    const multipliers = [];
+                    const used = new Set();
+                    let attempts = 0;
+                    while (multipliers.length < N - 1 && attempts < 250) {
+                        const m = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
+                        if (!used.has(m)) {
+                            multipliers.push(m);
+                            used.add(m);
+                        }
+                        attempts++;
                     }
-                    attempts++;
+                    if (multipliers.length < N - 1) return null;
+
+                    const g_temp = gcdList(multipliers);
+                    let m1;
+                    attempts = 0;
+                    do {
+                        m1 = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
+                        attempts++;
+                        if (attempts > 120) {
+                            m1 = minMult;
+                            while (attempts < 300) {
+                                if (!used.has(m1) && gcd(m1, g_temp) === 1) break;
+                                m1++;
+                                attempts++;
+                                if (m1 > maxMult + 20) {
+                                    m1 = minMult;
+                                    while (used.has(m1)) m1++;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    } while (gcd(m1, g_temp) !== 1 || used.has(m1));
+
+                    multipliers.push(m1);
+                    if (gcdList(multipliers) !== 1) return null;
+                    return multipliers.map(m => m * G);
                 }
 
-                const g_temp = gcdList(multipliers);
+                let foundNumbers = null;
+                let actualSteps = 0;
 
-                let m1;
-                attempts = 0;
-                do {
-                    m1 = Math.floor(Math.random() * (maxMult - minMult + 1)) + minMult;
-                    attempts++;
-                    if (attempts > 100) {
-                        m1 = minMult;
-                        while(attempts < 300) {
-                             if (!usedMultipliers.has(m1) && gcd(m1, g_temp) === 1) break;
-                             m1++;
-                             attempts++;
-                             if (m1 > maxMult + 10) {
-                                 m1 = minMult;
-                                 while(usedMultipliers.has(m1)) m1++;
-                                 break;
-                             }
+                if (targetSteps !== null) {
+                    const ranges = targetSteps >= 5 ? [25, 45, 75] : [20, 35, 50];
+                    for (const maxM of ranges) {
+                        for (let i = 0; i < 450; i++) {
+                            const cand = tryGenerateCandidate(maxM);
+                            if (cand) {
+                                const testRes = findMKDWithSteps(cand);
+                                if (testRes.steps.length === targetSteps) {
+                                    foundNumbers = cand;
+                                    actualSteps = testRes.steps.length;
+                                    break;
+                                }
+                            }
                         }
-                        break; 
+                        if (foundNumbers) break;
                     }
-                } while (gcd(m1, g_temp) !== 1 || usedMultipliers.has(m1));
 
-                multipliers.push(m1);
+                    if (!foundNumbers) {
+                        exerciseResultDiv.innerHTML = `<span>Δεν βρέθηκε άσκηση με ακριβώς <strong>${targetSteps} γραμμές</strong> για τις παραμέτρους αυτές. Δοκιμάστε διαφορετικό αριθμό γραμμών ή αφήστε το κενό.</span>`;
+                        exerciseResultDiv.style.display = 'flex';
+                        return;
+                    }
+                } else {
+                    for (let i = 0; i < 300; i++) {
+                        const cand = tryGenerateCandidate(20);
+                        if (cand) {
+                            const testRes = findMKDWithSteps(cand);
+                            foundNumbers = cand;
+                            actualSteps = testRes.steps.length;
+                            break;
+                        }
+                    }
+                }
 
-                const finalNumbers = multipliers.map(m => m * G);
-                const numbersString = finalNumbers.join(', ');
+                if (!foundNumbers) {
+                    exerciseResultDiv.innerHTML = '<span>Αδυναμία παραγωγής άσκησης. Παρακαλώ αλλάξτε τις παραμέτρους.</span>';
+                    exerciseResultDiv.style.display = 'flex';
+                    return;
+                }
+
+                const numbersString = foundNumbers.join(', ');
+                const stepTag = targetSteps ? ` | Γραμμές: <strong>${actualSteps}</strong>` : ` | Γραμμές: ${actualSteps}`;
 
                 exerciseResultDiv.innerHTML = `
-                    <span><strong>Άσκηση:</strong> Βρείτε τον ΜΚΔ των <strong>${numbersString}</strong>. (Απάντηση: ${G})</span>
+                    <span><strong>Άσκηση:</strong> Βρείτε τον ΜΚΔ των <strong>${numbersString}</strong>. (Απάντηση: <strong>${G}</strong>${stepTag})</span>
                     <button id="copyToCalcBtn" class="copy-btn" title="Αντιγραφή στον Υπολογιστή για έλεγχο">Αντιγραφή ↑</button>
                 `;
                 exerciseResultDiv.style.display = 'flex';
@@ -834,15 +1091,45 @@
             
             desiredGcdInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
-                    event.preventDefault();
+                    event.preventDefault(); 
                     handleGenerateExercise();
                 }
             });
 
             numberCountInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
-                    event.preventDefault();
+                    event.preventDefault(); 
                     handleGenerateExercise();
+                }
+            });
+
+            stepCountInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    handleGenerateExercise();
+                }
+            });
+
+            copySolutionBtn.addEventListener('click', async () => {
+                if (!currentCalculation) return;
+                const { numbers, steps, gcdText } = currentCalculation;
+                const htmlTable = generateWordHtmlTable(numbers, steps, gcdText);
+                const plainTextTable = generatePlainTextTable(numbers, steps, gcdText);
+
+                const success = await copyFormattedSolution(htmlTable, plainTextTable);
+                if (success) {
+                    const originalHtml = copySolutionBtn.innerHTML;
+                    copySolutionBtn.classList.add('copied');
+                    copySolutionBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                        </svg>
+                        <span>Αντιγράφηκε!</span>
+                    `;
+                    setTimeout(() => {
+                        copySolutionBtn.classList.remove('copied');
+                        copySolutionBtn.innerHTML = originalHtml;
+                    }, 2000);
                 }
             });
 
