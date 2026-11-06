@@ -68,8 +68,22 @@
         h1 {
             color: #005a9c;
             margin-top: 0;
-            padding-right: 1.5rem;
-            font-size: 1.7rem;
+            margin-bottom: 0.4rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .method-subtitle {
+            display: inline-block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #005a9c;
+            background: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            padding: 0.25rem 0.85rem;
+            border-radius: 9999px;
+            margin-bottom: 1.1rem;
+            letter-spacing: 0.2px;
         }
         
         h2 {
@@ -427,7 +441,8 @@
         </button>
 
         <div>
-            <h1>Υπολογιστής ΜΚΔ (Μέθοδος Διαδοχικών Διαιρέσεων)</h1>
+            <h1>Υπολογιστής ΜΚΔ</h1>
+            <div class="method-subtitle">Μέθοδος Διαδοχικών Διαιρέσεων</div>
             <p>Εισάγετε τους φυσικούς αριθμούς, χωρισμένους με κόμμα (π.χ. 15, 25, 30).</p>
             
             <input type="text" id="numbersInput" placeholder="π.χ. 12, 18, 24">
@@ -519,7 +534,7 @@
          * Αλλάξτε καρφωτά την παρακάτω τιμή για να ανανεωθεί η έκδοση στο Modal
          * και σε όλη την εφαρμογή.
          ******************************************************************************/
-        const APP_VERSION = "2.1.2"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
+        const APP_VERSION = "2.1.3"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
         /******************************************************************************/
 
         document.addEventListener('DOMContentLoaded', (event) => {
