@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Υπολογιστής & Δημιουργία Ασκήσεων ΜΚΔ</title>
+    <meta name="description" content="Εκπαιδευτική εφαρμογή υπολογισμού και παραγωγής ασκήσεων ΜΚΔ με τη μέθοδο των διαδοχικών διαιρέσεων." />
+    <meta property="og:title" content="Υπολογιστής & Δημιουργία Ασκήσεων ΜΚΔ" />
+    <meta property="og:description" content="Εκπαιδευτική εφαρμογή υπολογισμού και παραγωγής ασκήσεων ΜΚΔ με τη μέθοδο των διαδοχικών διαιρέσεων." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -514,7 +519,7 @@
          * Αλλάξτε καρφωτά την παρακάτω τιμή για να ανανεωθεί η έκδοση στο Modal
          * και σε όλη την εφαρμογή.
          ******************************************************************************/
-        const APP_VERSION = "2.1.1"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
+        const APP_VERSION = "2.1.2"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
         /******************************************************************************/
 
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -812,6 +817,20 @@
                 }
             });
             
+            desiredGcdInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleGenerateExercise();
+                }
+            });
+
+            numberCountInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleGenerateExercise();
+                }
+            });
+
             generateBtn.addEventListener('click', handleGenerateExercise);
 
         });
