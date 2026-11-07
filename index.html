@@ -9,6 +9,23 @@
     <meta property="og:description" content="Εκπαιδευτική εφαρμογή υπολογισμού και παραγωγής ασκήσεων ΜΚΔ με τη μέθοδο των διαδοχικών διαιρέσεων." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ========================================================================== -->
+    <!--                   ΡΥΘΜΙΣΕΙΣ PWA & HOSTING URL (METADATA)                   -->
+    <!-- ========================================================================== -->
+    <!-- Το επίσημο URL φιλοξενίας της εφαρμογής είναι: https://tethragon.github.io/mkd/ -->
+    <!-- Αν αλλάξετε domain ή φάκελο φιλοξενίας, αλλάξτε τα σχετικά paths παρακάτω.  -->
+    <!-- ========================================================================== -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <link rel="alternate icon" type="image/png" href="./pwa-192x192.png">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="theme-color" content="#005a9c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ΜΚΔ">
+
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -33,36 +50,86 @@
             position: relative;
         }
 
-        /* Κουμπί Πληροφοριών / Modal Trigger */
-        .info-btn {
+        /* Πάνω δεξιά ομάδα ενεργειών (Share & Info) */
+        .top-actions {
             position: absolute;
             top: 1rem;
             right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .action-top-btn {
             background: #f0f4f8;
             border: 1px solid #d0d7de;
             color: #005a9c;
             border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            display: flex;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
         }
 
-        .info-btn:hover {
+        .action-top-btn:hover {
             background-color: #005a9c;
             color: #ffffff;
-            transform: scale(1.06);
+            border-color: #005a9c;
+            transform: scale(1.08);
         }
 
-        .info-btn svg {
+        .action-top-btn.copied {
+            background-color: #28a745;
+            color: #ffffff;
+            border-color: #28a745;
+            transform: scale(1.08);
+        }
+
+        .action-top-btn svg {
             width: 18px;
             height: 18px;
             fill: currentColor;
+        }
+
+        /* Toast Ειδοποίηση Αντιγραφής */
+        .toast-notification {
+            position: fixed;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-35px);
+            background: #1e293b;
+            color: #ffffff;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-notification svg {
+            width: 18px;
+            height: 18px;
+            fill: #4ade80;
+            flex-shrink: 0;
         }
 
         h1 {
@@ -348,14 +415,168 @@
 
         .modal-card {
             background: #ffffff;
-            width: 90%;
-            max-width: 500px;
+            width: 92%;
+            max-width: 580px;
+            max-height: 88vh;
+            overflow-y: auto;
             border-radius: 12px;
             padding: 2rem;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
             position: relative;
             text-align: left;
             animation: modalFadeIn 0.25s ease-out forwards;
+        }
+
+        /* --- STYLES ΟΔΗΓΟΥ ΕΓΚΑΤΑΣΤΑΣΗΣ PWA --- */
+        .pwa-section {
+            margin-top: 1.3rem;
+            border-top: 1px solid #eef2f6;
+            padding-top: 1.1rem;
+        }
+
+        .pwa-section-title {
+            margin: 0 0 0.8rem 0;
+            color: #005a9c;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pwa-direct-install-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #007bff, #005a9c);
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.9rem;
+            box-shadow: 0 3px 8px rgba(0, 90, 156, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .pwa-direct-install-btn:hover {
+            background: linear-gradient(135deg, #0069d9, #00467a);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(0, 90, 156, 0.35);
+        }
+
+        .pwa-installed-badge {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.9rem;
+        }
+
+        .install-guide-heading {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0.55rem;
+        }
+
+        .install-tabs {
+            display: flex;
+            gap: 0.45rem;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .install-tab-btn {
+            background: #f0f4f8;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .install-tab-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .install-tab-btn .tab-arrow {
+            font-size: 0.7rem;
+            margin-left: 0.2rem;
+            transition: transform 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .install-tab-btn:hover {
+            background: #e1ebf5;
+            color: #005a9c;
+            border-color: #b6d4fe;
+        }
+
+        .install-tab-btn.active {
+            background: #005a9c;
+            color: #ffffff;
+            border-color: #005a9c;
+        }
+
+        .install-tab-btn.active .tab-arrow {
+            transform: rotate(180deg);
+        }
+
+        .install-tab-content {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 0.9rem 1.1rem;
+            font-size: 0.88rem;
+            color: #333;
+            line-height: 1.55;
+            margin-bottom: 0.8rem;
+        }
+
+        .install-tab-content.open {
+            display: block;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        .install-step-list {
+            margin: 0.4rem 0 0 0;
+            padding-left: 1.25rem;
+        }
+
+        .install-step-list li {
+            margin-bottom: 0.45rem;
+        }
+
+        .install-step-list li strong {
+            color: #005a9c;
+        }
+
+        .platform-subtitle {
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0.6rem 0 0.2rem 0;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         @keyframes modalFadeIn {
@@ -494,13 +715,28 @@
 </head>
 <body>
 
+    <!-- Toast Ειδοποίηση Αντιγραφής Συνδέσμου -->
+    <div id="toastNotification" class="toast-notification" role="status" aria-live="polite">
+        <svg viewBox="0 0 24 24">
+            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+        </svg>
+        <span id="toastMessage">Ο σύνδεσμος αντιγράφηκε στο πρόχειρο!</span>
+    </div>
+
     <div class="container">
-        <!-- Κουμπί ανοίγματος Modal Πληροφοριών -->
-        <button id="infoModalBtn" class="info-btn" title="Πληροφορίες & Έκδοση">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
-        </button>
+        <!-- Πάνω δεξιά ομάδα ενεργειών (Share & Info) -->
+        <div class="top-actions">
+            <button id="shareTopBtn" class="action-top-btn" title="Αντιγραφή συνδέσμου εφαρμογής" aria-label="Αντιγραφή συνδέσμου εφαρμογής">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/>
+                </svg>
+            </button>
+            <button id="infoModalBtn" class="action-top-btn" title="Πληροφορίες & Έκδοση" aria-label="Πληροφορίες & Έκδοση">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+            </button>
+        </div>
 
         <div>
             <h1>Υπολογιστής ΜΚΔ</h1>
@@ -560,13 +796,13 @@
         </div>
     </div>
 
-    <!-- MODAL ΠΛΗΡΟΦΟΡΙΩΝ ΕΦΑΡΜΟΓΗΣ -->
+    <!-- MODAL ΠΛΗΡΟΦΟΡΙΩΝ & ΕΓΚΑΤΑΣΤΑΣΗΣ ΕΦΑΡΜΟΓΗΣ -->
     <div id="aboutModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-card">
             <button class="modal-close-btn" id="modalCloseX" aria-label="Κλείσιμο">&times;</button>
             
             <div class="modal-header">
-                <h3 id="modalTitle">Ταυτότητα Εφαρμογής</h3>
+                <h3 id="modalTitle">Ταυτότητα Εφαρμογής & Εγκατάσταση</h3>
             </div>
             
             <div class="modal-row">
@@ -577,6 +813,90 @@
             <div class="modal-row">
                 <span class="modal-label">Έκδοση (Version):</span>
                 <span id="appVersionDisplay" class="badge-version">v...</span>
+            </div>
+
+            <!-- ΕΝΟΤΗΤΑ ΕΓΚΑΤΑΣΤΑΣΗΣ PWA -->
+            <div class="pwa-section">
+                <h4 class="pwa-section-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                    </svg>
+                    Οδηγός Εγκατάστασης (PWA App)
+                </h4>
+
+                <!-- Κουμπί άμεσης εγκατάστασης για υποστηριζόμενους browsers -->
+                <button id="pwaInstallModalBtn" class="pwa-direct-install-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    <span>Εγκατάσταση Εφαρμογής στη Συσκευή</span>
+                </button>
+
+                <div id="pwaInstalledNotice" class="pwa-installed-badge">
+                    ✓ Η εφαρμογή λειτουργεί ως εγκατεστημένη εφαρμογή στη συσκευή σας.
+                </div>
+
+                <div class="install-guide-heading">Οδηγίες εγκατάστασης ανά πρόγραμμα περιήγησης (πατήστε για εμφάνιση):</div>
+
+                <!-- Tabs Επιλογής Browser (αρχικά κλειστά όλα για εξοικονόμηση χώρου) -->
+                <div class="install-tabs">
+                    <button class="install-tab-btn" data-tab="chrome">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3.17.58 4.38 1.55l-3.32 5.75C12.72 12.11 12.38 12 12 12c-1.48 0-2.75.81-3.45 2H5.08C5.66 8.48 8.56 5 12 5zm-7 7c0-.34.03-.67.08-1h6.64c.18.59.54 1.1 1.01 1.47L9.41 20.22C6.83 19.04 5 15.77 5 12zm7 7c-.24 0-.48-.02-.71-.06l3.32-5.75c.42.14.87.21 1.39.21.72 0 1.38-.2 1.95-.54l3.47 5.99C19.78 19.8 16.12 21 12 19zm4.28-7.53L19.6 5.48C20.48 7.34 21 9.4 21 12c0 1.25-.23 2.45-.64 3.56l-3.47-5.99c-.19-.34-.41-.65-.67-.93l.06-.17z"/></svg>
+                        <span>Google Chrome</span>
+                        <span class="tab-arrow">&#9660;</span>
+                    </button>
+                    <button class="install-tab-btn" data-tab="firefox">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79.09.43.25.84.47 1.22.42.74 1.04 1.35 1.79 1.77.37.21.77.37 1.19.46.42.09.85.12 1.28.08.86-.07 1.68-.38 2.37-.89.69-.51 1.21-1.2 1.5-2 .29-.8.34-1.67.14-2.52-.2-.85-.66-1.61-1.32-2.18-.33-.28-.7-.51-1.1-.68.45-.11.92-.15 1.39-.12.94.06 1.84.4 2.58.97.74.57 1.29 1.34 1.57 2.22.28.88.29 1.83.03 2.72-.26.89-.78 1.68-1.49 2.27-.71.59-1.58.97-2.51 1.09-.34.04-.68.04-1.02.01-.22-.02-.44-.06-.65-.12.4.21.84.34 1.3.38.46.04.93-.01 1.38-.15.45-.14.87-.37 1.23-.68.36-.31.65-.7.85-1.14.2-.44.3-.92.29-1.41-.01-.49-.13-.96-.34-1.39.67.65 1.14 1.48 1.35 2.39.21.91.15 1.86-.17 2.74-.32.88-.89 1.64-1.64 2.19-.75.55-1.64.88-2.57.94-.47.03-.94-.01-1.4-.11z"/></svg>
+                        <span>Mozilla Firefox</span>
+                        <span class="tab-arrow">&#9660;</span>
+                    </button>
+                    <button class="install-tab-btn" data-tab="ios">
+                        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.7.99.08 2.02-.51 2.59-1.19z"/></svg>
+                        <span>iPhone / iPad</span>
+                        <span class="tab-arrow">&#9660;</span>
+                    </button>
+                </div>
+
+                <!-- Περιεχόμενο Tab Chrome (αρχικά κλειστό) -->
+                <div id="tab-chrome" class="install-tab-content">
+                    <div class="platform-subtitle">📱 Στο Κινητό (Android)</div>
+                    <ol class="install-step-list">
+                        <li>Πατήστε τις <strong>τρεις τελείες (⋮)</strong> επάνω δεξιά στο Chrome.</li>
+                        <li>Επιλέξτε <strong>«Εγκατάσταση εφαρμογής»</strong> ή <strong>«Προσθήκη στην αρχική οθόνη»</strong>.</li>
+                        <li>Επιβεβαιώστε πατώντας <strong>«Εγκατάσταση»</strong>.</li>
+                    </ol>
+                    <div class="platform-subtitle" style="margin-top:0.8rem;">💻 Στον Υπολογιστή (Desktop)</div>
+                    <ol class="install-step-list">
+                        <li>Πατήστε το εικονίδιο <strong>Εγκατάστασης (⊕)</strong> στη δεξιά πλευρά της γραμμής διευθύνσεων.</li>
+                        <li>Ή πατήστε <strong>⋮ &rarr; «Αποθήκευση και κοινοποίηση» &rarr; «Εγκατάσταση σελίδας ως εφαρμογής»</strong>.</li>
+                    </ol>
+                </div>
+
+                <!-- Περιεχόμενο Tab Firefox (αρχικά κλειστό) -->
+                <div id="tab-firefox" class="install-tab-content">
+                    <div class="platform-subtitle">📱 Στο Κινητό (Android)</div>
+                    <ol class="install-step-list">
+                        <li>Πατήστε τις <strong>τρεις τελείες (⋮)</strong> στη γραμμή διευθύνσεων του Firefox.</li>
+                        <li>Επιλέξτε <strong>«Εγκατάσταση»</strong> (ή «Προσθήκη στην αρχική οθόνη»).</li>
+                        <li>Το εικονίδιο του ΜΚΔ θα προστεθεί στην οθόνη των εφαρμογών σας.</li>
+                    </ol>
+                    <div class="platform-subtitle" style="margin-top:0.8rem;">💻 Στον Υπολογιστή (Desktop)</div>
+                    <ol class="install-step-list">
+                        <li>Πατήστε <strong>Ctrl + D</strong> (ή <strong>⌘ + D</strong> σε Mac) για άμεση προσθήκη στους Σελιδοδείκτες.</li>
+                        <li>Για συντόμευση στην επιφάνεια εργασίας, σύρετε το εικονίδιο <strong>λουκέτου</strong> από τη γραμμή διευθύνσεων στην επιφάνεια εργασίας σας.</li>
+                    </ol>
+                </div>
+
+                <!-- Περιεχόμενο Tab iOS (iPhone / iPad) (αρχικά κλειστό) -->
+                <div id="tab-ios" class="install-tab-content">
+                    <div class="platform-subtitle">🍏 Στο iPhone & iPad (Safari)</div>
+                    <ol class="install-step-list">
+                        <li>Ανοίξτε τον σύνδεσμο στο πρόγραμμα περιήγησης <strong>Safari</strong>.</li>
+                        <li>Πατήστε το κουμπί <strong>Κοινοποίησης (Share 📤)</strong> στο κάτω μέρος της οθόνης.</li>
+                        <li>Κυλήστε προς τα κάτω και πατήστε <strong>«Προσθήκη στην οθόνη αφετηρίας» (Add to Home Screen ⊞)</strong>.</li>
+                        <li>Πατήστε <strong>«Προσθήκη»</strong> επάνω δεξιά για ολοκλήρωση.</li>
+                    </ol>
+                </div>
             </div>
 
             <div class="license-card">
@@ -603,27 +923,169 @@
     <script>
         /*******************************************************************************
          * ============================================================================
-         *                       ΡΥΘΜΙΣΕΙΣ ΕΚΔΟΣΗΣ ΕΦΑΡΜΟΓΗΣ
+         *                      ΡΥΘΜΙΣΕΙΣ HOSTING & ΕΚΔΟΣΗΣ ΕΦΑΡΜΟΓΗΣ
          * ============================================================================
-         * Αλλάξτε καρφωτά την παρακάτω τιμή για να ανανεωθεί η έκδοση στο Modal
-         * και σε όλη την εφαρμογή.
+         * Εδώ δηλώνεται η επίσημη διεύθυνση φιλοξενίας (hosting URL) της εφαρμογής.
+         * Αν αλλάξετε domain ή φάκελο φιλοξενίας (π.χ. από GitHub Pages σε άλλο host),
+         * τροποποιήστε καρφωτά την παρακάτω τιμή.
          ******************************************************************************/
-        const APP_VERSION = "2.2.1"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
+        const APP_HOSTING_URL = "https://tethragon.github.io/mkd/"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ ΤΟ URL ΦΙΛΟΞΕΝΙΑΣ]
+        const APP_VERSION = "2.4.0"; // <-- [ΕΔΩ ΟΡΙΖΕΤΑΙ Η ΕΚΔΟΣΗ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ]
         /******************************************************************************/
 
         document.addEventListener('DOMContentLoaded', (event) => {
             
-            // --- ΣΤΟΙΧΕΙΑ MODAL & ΕΚΔΟΣΗΣ ---
+            // --- ΚΑΤΑΧΩΡΙΣΗ PWA SERVICE WORKER ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(reg => {
+                            console.log('PWA Service Worker καταχωρήθηκε:', reg.scope);
+                        })
+                        .catch(err => {
+                            console.warn('PWA Service Worker σφάλμα:', err);
+                        });
+                });
+            }
+
+            // --- ΣΤΟΙΧΕΙΑ ΕΝΕΡΓΕΙΩΝ ΚΑΙ MODAL ---
+            const shareTopBtn = document.getElementById('shareTopBtn');
+            const toastNotification = document.getElementById('toastNotification');
+            const toastMessage = document.getElementById('toastMessage');
             const aboutModal = document.getElementById('aboutModal');
             const infoModalBtn = document.getElementById('infoModalBtn');
             const modalCloseX = document.getElementById('modalCloseX');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
             const appVersionDisplay = document.getElementById('appVersionDisplay');
+            const pwaInstallModalBtn = document.getElementById('pwaInstallModalBtn');
+            const pwaInstalledNotice = document.getElementById('pwaInstalledNotice');
 
             // Προβολή της έκδοσης στο Modal
             if (appVersionDisplay) {
                 appVersionDisplay.textContent = `v${APP_VERSION}`;
             }
+
+            // Συνάρτηση εμφάνισης Toast ειδοποίησης
+            let toastTimeout = null;
+            function showToast(message) {
+                if (!toastNotification) return;
+                if (toastMessage && message) {
+                    toastMessage.textContent = message;
+                }
+                toastNotification.classList.add('show');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toastNotification.classList.remove('show');
+                }, 2800);
+            }
+
+            // Κουμπί Share δίπλα στο 'i': Αντιγραφή συνδέσμου στο πρόχειρο & ειδοποίηση
+            if (shareTopBtn) {
+                shareTopBtn.addEventListener('click', async () => {
+                    let success = false;
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(APP_HOSTING_URL);
+                            success = true;
+                        } else {
+                            throw new Error('Clipboard API unavailable');
+                        }
+                    } catch (err) {
+                        // Fallback με προσωρινό textarea
+                        try {
+                            const tempInput = document.createElement('textarea');
+                            tempInput.value = APP_HOSTING_URL;
+                            tempInput.style.position = 'fixed';
+                            tempInput.style.opacity = '0';
+                            document.body.appendChild(tempInput);
+                            tempInput.focus();
+                            tempInput.select();
+                            success = document.execCommand('copy');
+                            document.body.removeChild(tempInput);
+                        } catch (fallbackErr) {
+                            console.warn('Copy failed', fallbackErr);
+                        }
+                    }
+
+                    if (success) {
+                        shareTopBtn.classList.add('copied');
+                        shareTopBtn.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                            </svg>
+                        `;
+                        shareTopBtn.title = 'Αντιγράφηκε!';
+                        showToast('Ο σύνδεσμος της εφαρμογής αντιγράφηκε στο πρόχειρο!');
+                        setTimeout(() => {
+                            shareTopBtn.classList.remove('copied');
+                            shareTopBtn.innerHTML = `
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/>
+                                </svg>
+                            `;
+                            shareTopBtn.title = 'Αντιγραφή συνδέσμου εφαρμογής';
+                        }, 2000);
+                    }
+                });
+            }
+
+            // --- ΔΙΑΧΕΙΡΙΣΗ PWA ΕΓΚΑΤΑΣΤΑΣΗΣ ---
+            let deferredInstallPrompt = null;
+            const isAppStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                                    (window.navigator && window.navigator.standalone === true);
+
+            if (isAppStandalone && pwaInstalledNotice) {
+                pwaInstalledNotice.style.display = 'block';
+                if (pwaInstallModalBtn) pwaInstallModalBtn.style.display = 'none';
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredInstallPrompt = e;
+                if (pwaInstallModalBtn && !isAppStandalone) {
+                    pwaInstallModalBtn.style.display = 'inline-flex';
+                }
+            });
+
+            if (pwaInstallModalBtn) {
+                pwaInstallModalBtn.addEventListener('click', async () => {
+                    if (!deferredInstallPrompt) return;
+                    deferredInstallPrompt.prompt();
+                    const choiceResult = await deferredInstallPrompt.userChoice;
+                    if (choiceResult && choiceResult.outcome === 'accepted') {
+                        pwaInstallModalBtn.style.display = 'none';
+                        if (pwaInstalledNotice) pwaInstalledNotice.style.display = 'block';
+                    }
+                    deferredInstallPrompt = null;
+                });
+            }
+
+            window.addEventListener('appinstalled', () => {
+                if (pwaInstallModalBtn) pwaInstallModalBtn.style.display = 'none';
+                if (pwaInstalledNotice) pwaInstalledNotice.style.display = 'block';
+            });
+
+            // --- ΠΤΥΣΣΟΜΕΝΕΣ ΟΔΗΓΙΕΣ ΕΓΚΑΤΑΣΤΑΣΗΣ (COLLAPSIBLE / ACCORDION) ---
+            const tabBtns = document.querySelectorAll('.install-tab-btn');
+            const tabContents = document.querySelectorAll('.install-tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabKey = btn.getAttribute('data-tab');
+                    const targetContent = document.getElementById(`tab-${tabKey}`);
+                    const isAlreadyOpen = targetContent && targetContent.classList.contains('open');
+
+                    // Κλείσιμο όλων των ανοιχτών οδηγιών
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('open'));
+
+                    // Toggle: Αν δεν ήταν ήδη ανοιχτό, ανοίγει
+                    if (!isAlreadyOpen && targetContent) {
+                        btn.classList.add('active');
+                        targetContent.classList.add('open');
+                    }
+                });
+            });
 
             function openModal() {
                 aboutModal.style.display = 'flex';

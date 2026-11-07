@@ -1,0 +1,45 @@
+{
+  "id": "https://tethragon.github.io/mkd/",
+  "name": "Υπολογιστής & Δημιουργία Ασκήσεων ΜΚΔ",
+  "short_name": "ΜΚΔ",
+  "description": "Εκπαιδευτική εφαρμογή για τον υπολογισμό και τη δημιουργία ασκήσεων Μέγιστου Κοινού Διαιρέτη (ΜΚΔ) με τη μέθοδο των διαδοχικών διαιρέσεων.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f7f6",
+  "theme_color": "#005a9c",
+  "lang": "el",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
